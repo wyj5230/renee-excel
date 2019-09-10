@@ -6,7 +6,7 @@ public class Cloth
     String title;
     String brandDesc;
     String brandCode;
-    String size;
+    int size;
     String gender;
     String lowestCategories1;
     String lowestCategories2;
@@ -14,7 +14,7 @@ public class Cloth
     String lowestCategories4;
 
     public Cloth(String styleItem, String styleItemColor, String shelfItem, String title, String brandDesc, String
-            brandCode, String size, String gender, String lowestCategories1, String lowestCategories2, String
+            brandCode, int size, String gender, String lowestCategories1, String lowestCategories2, String
             lowestCategories3, String lowestCategories4)
     {
         this.styleItem = styleItem;
@@ -91,12 +91,12 @@ public class Cloth
         this.brandCode = brandCode;
     }
 
-    public String getSize()
+    public int getSize()
     {
         return size;
     }
 
-    public void setSize(String size)
+    public void setSize(int size)
     {
         this.size = size;
     }

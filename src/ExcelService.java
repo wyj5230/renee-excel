@@ -58,7 +58,9 @@ public class ExcelService
                 newNine.setCellValue(sample.getYearSeason());
                 Cell newTen = currentRow.createCell(41);
                 newTen.setCellValue(sample.getEvent());
-                validateAndCreateCloth(currentRow, "2018PE", "1", "FALSE", "TRUE", "0");
+                Cloth cloth = validateAndCreateCloth(currentRow, "2018PE", "1", "FALSE", "TRUE", "0");
+                clothList.add(cloth);
+                clothMap.put(cloth.getStyleItem(), cloth);
             }
             else
             {
@@ -69,20 +71,40 @@ public class ExcelService
                 new FileOutputStream(new File("./newActual.xls"));
         workbook.write(out);
         out.close();
+        System.out.println("成功生成新的原表：newActual.xls");
         workbook.close();
         inputStream.close();
+        System.out.println("生成新表，sheet1共有：" + clothList.size() + "条记录, sheet2（去重后）共有：" + clothMap.size() + "条记录");
     }
 
-    public static void validateAndCreateCloth(Row row, String yearSeasonFilter, String originalFilter,
-                                              String cnFilter, String styleTytleFilter, String stockFilter)
+    public static Cloth validateAndCreateCloth(Row row, String yearSeasonFilter, String originalFilter,
+                                               String cnFilter, String styleTytleFilter, String stockFilter)
     {
         String yearSeason = row.getCell(40).getStringCellValue();
-        double original = row.getCell(12).getNumericCellValue();
+        int original = (int) row.getCell(12).getNumericCellValue();
         String cnr = row.getCell(15).getStringCellValue();
         String styleTytle = row.getCell(21).getStringCellValue();
-        double stock = row.getCell(31).getNumericCellValue();
+        int stock = (int) row.getCell(31).getNumericCellValue();
         System.out.println("yearSeason:" + yearSeason + ", original:" + original + "cnr:" + ", " + cnr + ", " +
                 "styleTytle:" + styleTytle + ", stock:" + stock);
+        String styleItem = row.getCell(0) != null ? row.getCell(0).getStringCellValue() : null;
+        String styleItemColor = row.getCell(1) != null ? row.getCell(1).getStringCellValue() : null;
+        String shelfItem = row.getCell(2) != null ? row.getCell(2).getStringCellValue() : null;
+        String title = row.getCell(3) != null ? row.getCell(3).getStringCellValue() : null;
+        String brandDesc = row.getCell(4) != null ? row.getCell(4).getStringCellValue() : null;
+        String brandCode = row.getCell(5) != null ? row.getCell(5).getStringCellValue() : null;
+        int size = 0;
+        if (row.getCell(6) != null)
+        {
+            size = (int) row.getCell(6).getNumericCellValue();
+        }
+        String gender = row.getCell(7) != null ? row.getCell(7).getStringCellValue() : null;
+        String lowestCategories1 = row.getCell(17) != null ? row.getCell(17).getStringCellValue() : null;
+        String lowestCategories2 = row.getCell(18) != null ? row.getCell(18).getStringCellValue() : null;
+        String lowestCategories3 = row.getCell(19) != null ? row.getCell(19).getStringCellValue() : null;
+        String lowestCategories4 = row.getCell(20) != null ? row.getCell(20).getStringCellValue() : null;
+        return new Cloth(styleItem, styleItemColor, shelfItem, title, brandDesc, brandCode, size, gender,
+                lowestCategories1, lowestCategories2, lowestCategories3, lowestCategories4);
     }
 
 
