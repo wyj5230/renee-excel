@@ -1,14 +1,13 @@
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class ExcelService
 {
@@ -25,8 +24,8 @@ public class ExcelService
             Row currentRow = firstSheet.getRow(i);
             sampleMap.put(currentRow.getCell(0).getStringCellValue(),
                     new Sample(currentRow.getCell(0).getStringCellValue(),
-                            currentRow.getCell(0).getStringCellValue(),
-                            currentRow.getCell(0).getStringCellValue()));
+                            currentRow.getCell(1).getStringCellValue(),
+                            currentRow.getCell(2).getStringCellValue()));
         }
         System.out.println("对照表(去重)共有" + sampleMap.size() + "行");
         workbook.close();
@@ -42,48 +41,49 @@ public class ExcelService
         int total = firstSheet.getLastRowNum();
         System.out.println("原表共有" + total + "行");
         Row second = firstSheet.getRow(1);
-        moveRight(second);
-        Cell nine = second.createCell(9);
-        Cell ten = second.createCell(10);
-        nine.setCellValue("yearSeason");
-        ten.setCellValue("event");
-        second.getLastCellNum();
-//        for (int i = 2; i <= total - 1; i++)
-//        {
-//            Row currentRow = firstSheet.getRow(i);
-//            Sample sample = sampleMap.get(currentRow.getCell(0).getStringCellValue());
-//            if (sample != null){
-//                Cell newNine = currentRow.createCell(9);
-//                Cell newTen = currentRow.createCell(10);
-//            }
-//        }
+        Cell lastleft = second.createCell(40);
+        Cell lastright = second.createCell(41);
+        lastleft.setCellValue("yearSeason");
+        lastright.setCellValue("event");
+        List<Cloth> clothList = new ArrayList<>();
+        Map<String, Cloth> clothMap = new HashMap<>();
+        for (int i = 2; i <= total; i++)
+        {
+            Row currentRow = firstSheet.getRow(i);
+            String id = currentRow.getCell(1).getStringCellValue();
+            Sample sample = sampleMap.get(id);
+            if (sample != null)
+            {
+                Cell newNine = currentRow.createCell(40);
+                newNine.setCellValue(sample.getYearSeason());
+                Cell newTen = currentRow.createCell(41);
+                newTen.setCellValue(sample.getEvent());
+                validateAndCreateCloth(currentRow, "2018PE", "1", "FALSE", "TRUE", "0");
+            }
+            else
+            {
+                System.out.println("未能在对照表中发现货品：");
+            }
+        }
         FileOutputStream out =
-                new FileOutputStream(new File("./new.xls"));
+                new FileOutputStream(new File("./newActual.xls"));
         workbook.write(out);
         out.close();
         workbook.close();
         inputStream.close();
     }
 
-    private static void moveRight(Row row)
+    public static void validateAndCreateCloth(Row row, String yearSeasonFilter, String originalFilter,
+                                              String cnFilter, String styleTytleFilter, String stockFilter)
     {
-        for (int i = 39; i >= 9; i--)
-        {
-            Cell right = row.createCell(i + 2);
-            Cell left = row.getCell(i);
-            if (left.getCellType() == CellType.BOOLEAN)
-            {
-                right.setCellValue(left.getBooleanCellValue());
-            }
-            else if (left.getCellType() == CellType.NUMERIC)
-            {
-                right.setCellValue(left.getNumericCellValue());
-            }
-            else
-            {
-                right.setCellValue(left.getStringCellValue());
-            }
-            right.setCellStyle(left.getCellStyle());
-        }
+        String yearSeason = row.getCell(40).getStringCellValue();
+        double original = row.getCell(12).getNumericCellValue();
+        String cnr = row.getCell(15).getStringCellValue();
+        String styleTytle = row.getCell(21).getStringCellValue();
+        double stock = row.getCell(31).getNumericCellValue();
+        System.out.println("yearSeason:" + yearSeason + ", original:" + original + "cnr:" + ", " + cnr + ", " +
+                "styleTytle:" + styleTytle + ", stock:" + stock);
     }
+
+
 }
