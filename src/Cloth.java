@@ -1,17 +1,17 @@
 public class Cloth
 {
-    String styleItem;
-    String styleItemColor;
-    String shelfItem;
-    String title;
-    String brandDesc;
-    String brandCode;
-    String size;
-    String gender;
-    String lowestCategories1;
-    String lowestCategories2;
-    String lowestCategories3;
-    String lowestCategories4;
+    private String styleItem;
+    private String styleItemColor;
+    private String shelfItem;
+    private String title;
+    private String brandDesc;
+    private String brandCode;
+    private String size;
+    private String gender;
+    private String lowestCategories1;
+    private String lowestCategories2;
+    private String lowestCategories3;
+    private String lowestCategories4;
 
     public Cloth(String styleItem, String styleItemColor, String shelfItem, String title, String brandDesc, String
             brandCode, String size, String gender, String lowestCategories1, String lowestCategories2, String
