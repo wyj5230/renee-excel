@@ -29,12 +29,12 @@ public class ExcelService {
         return sampleMap;
     }
 
-    public static void getActualXls(String path, Map<String, Sample> sampleMap) throws Exception {
+    public static void getActualXls(String path, Map<String, Sample> sampleMap, String yearSeasonFilter
+    , String originFilter, String styleTytleFilter) throws Exception {
         FileInputStream inputStream = new FileInputStream(new File(path));
         Workbook workbook = new HSSFWorkbook(inputStream);
         Sheet firstSheet = workbook.getSheetAt(0);
         int total = firstSheet.getLastRowNum();
-        System.out.println("原表共有" + total + "行");
         Row second = firstSheet.getRow(1);
         Cell lastleft = second.createCell(40);
         Cell lastright = second.createCell(41);
@@ -42,25 +42,39 @@ public class ExcelService {
         lastright.setCellValue("event");
         List<Cloth> clothList = new ArrayList<>();
         Map<String, Cloth> clothMap = new HashMap<>();
+        int skip = 0;
+        int notfound = 0;
         for (int i = 2; i <= total; i++) {
             Row currentRow = firstSheet.getRow(i);
             String id = currentRow.getCell(1).getStringCellValue();
             Sample sample = sampleMap.get(id);
+            if(i==9721){
+                System.out.println("9721");
+            }
             if (sample != null) {
                 Cell newNine = currentRow.createCell(40);
                 newNine.setCellValue(sample.getYearSeason());
                 Cell newTen = currentRow.createCell(41);
                 newTen.setCellValue(sample.getEvent());
                 Cloth cloth = validateAndCreateCloth(currentRow,
-                        "2019AI", "FALSE", "TRUE");
+                        yearSeasonFilter, "FALSE", styleTytleFilter, originFilter);
                 if (cloth != null) {
+                    System.out.println("第" + i + "列" + "审核通过，添加ID："+cloth.getStyleItem());
                     clothList.add(cloth);
                     clothMap.put(cloth.getStyleItem(), cloth);
+                } else {
+                    String styleItem = currentRow.getCell(0) != null ? currentRow.getCell(0).getStringCellValue() : null;
+                    System.out.println("因此，第" + i + "列" + "被跳过，失败ID："+styleItem);
+                    skip++;
                 }
             } else {
-                System.out.println("未能在对照表中发现货品：");
+                System.out.println("未能在对照表中发现货品：" + id);
+                notfound++;
             }
         }
+        System.out.println("原表共有" + total + "行");
+        System.out.println("共有" + skip + "条记录被跳过");
+        System.out.println("共有" + notfound + "条记录未在对照表中找到");
         FileOutputStream out =
                 new FileOutputStream(new File("./newActual.xls"));
         workbook.write(out);
@@ -72,29 +86,43 @@ public class ExcelService {
     }
 
     public static Cloth validateAndCreateCloth(Row row, String yearSeasonFilter,
-                                               String cnFilter, String styleTytleFilter) {
+                                               String cnFilter, String styleTytleFilter, String originFilter) {
         String yearSeason = row.getCell(40).getStringCellValue();
         if (!yearSeason.equals(yearSeasonFilter)) {
+            System.out.println("列名yearSeason核对失败， 目标值：" + yearSeasonFilter + ",实际值：" + yearSeason);
             return null;
         }
         int original = (int) row.getCell(12).getNumericCellValue();
-        if (original <= 0) {
+        if (originFilter.equals(">0") && original <= 0) {
+            System.out.println("列名original核对失败， 目标值："+originFilter+", 实际值：" + original);
+            return null;
+        }
+        if (originFilter.equals("=0") && original > 0) {
+            System.out.println("列名original核对失败， 目标值："+originFilter+", 实际值：" + original);
             return null;
         }
         String cnr = row.getCell(15).getStringCellValue();
         if (!cnr.equals(cnFilter)) {
+            System.out.println("列名cnr核对失败， 目标值：" + cnFilter + ",实际值：" + cnr);
             return null;
         }
         String styleTytle = row.getCell(21).getStringCellValue();
         if (!styleTytle.equals(styleTytleFilter)) {
+            System.out.println("列名styleTytle核对失败， 目标值：" + styleTytleFilter + ",实际值：" + styleTytle);
+            return null;
+        }
+        if (row.getCell(25) == null){
+            System.out.println("列名price核对失败，price值为空");
             return null;
         }
         int price = (int) row.getCell(25).getNumericCellValue();
         if (price <= 0) {
+            System.out.println("列名price核对失败， 目标值：>0, 实际值：" + price);
             return null;
         }
         int stock = (int) row.getCell(31).getNumericCellValue();
         if (stock <= 0) {
+            System.out.println("列名stock核对失败， 目标值：>0, 实际值：" + stock);
             return null;
         }
         System.out.println("yearSeason:" + yearSeason + ", original:" + original + "， cnr:" + cnr + ", price：" + price +

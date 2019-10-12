@@ -9,5 +9,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="activation-1.1.1" level="project" />
     <orderEntry type="library" name="curvesapi-1.06" level="project" />
+    <orderEntry type="library" name="lib" level="project" />
   </component>
 </module>
