@@ -48,9 +48,6 @@ public class ExcelService {
             Row currentRow = firstSheet.getRow(i);
             String id = currentRow.getCell(1).getStringCellValue();
             Sample sample = sampleMap.get(id);
-            if(i==9721){
-                System.out.println("9721");
-            }
             if (sample != null) {
                 Cell newNine = currentRow.createCell(40);
                 newNine.setCellValue(sample.getYearSeason());
@@ -88,7 +85,7 @@ public class ExcelService {
     public static Cloth validateAndCreateCloth(Row row, String yearSeasonFilter,
                                                String cnFilter, String styleTytleFilter, String originFilter) {
         String yearSeason = row.getCell(40).getStringCellValue();
-        if (!yearSeason.equals(yearSeasonFilter)) {
+        if (!validateYearSeason(yearSeason,yearSeasonFilter)) {
             System.out.println("列名yearSeason核对失败， 目标值：" + yearSeasonFilter + ",实际值：" + yearSeason);
             return null;
         }
@@ -246,5 +243,15 @@ public class ExcelService {
         cell10.setCellValue("3");
         Cell cell11 = sheet1TitleRow.createCell(11);
         cell11.setCellValue("4");
+    }
+    private static boolean validateYearSeason(String yearSeason, String yearSeasonFilter){
+        String[] yearSeasonList = yearSeasonFilter.split(",");
+        System.out.println("LIST length" + yearSeasonList.length);
+        for (String s : yearSeasonList){
+            if (s.equals(yearSeason)){
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -6,7 +6,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         Scanner sc = new Scanner(System.in);
-        System.out.println("请输入yearSeason：(例如'2019AI')");
+        System.out.println("请输入yearSeason：(例如'2019AI'或者'2019AI,2019SE')");
         String yearSeasonFilter = sc.next();
         System.out.println(yearSeasonFilter);
         System.out.println("请输入origin：('>0' 或者 '=0')");
